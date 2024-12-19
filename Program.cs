@@ -3,7 +3,6 @@
     public int N;
     public int K_F;
     public int K_D;
-    public int MaxIterations = 1000;
 
     private Random random = new Random();
     public long[,] graph;
@@ -67,10 +66,16 @@
         List<long> bestPath = new List<long>();
         long bestDistance = long.MaxValue;
 
-        for (int iteration = 0; iteration < MaxIterations; iteration++)
+        int noImprovementCounter = 0;
+        int maxNoImprovement = 100;
+        int iter = 1;
+
+        while (noImprovementCounter < maxNoImprovement)
         {
             List<(List<long>, long)> scoutRoutes = GenerateRandomRoutes(start, end, K_D);
             List<(List<long>, long)> forageRoutes = ExploitRoutes(scoutRoutes, K_F);
+
+            bool improved = false;
 
             foreach (var route in forageRoutes)
             {
@@ -78,7 +83,23 @@
                 {
                     bestDistance = route.Item2;
                     bestPath = route.Item1;
+                    improved = true;
                 }
+            }
+            iter++;
+
+            if (improved)
+            {
+                noImprovementCounter = 0;
+            }
+            else
+            {
+                noImprovementCounter++;
+            }
+
+            if (noImprovementCounter >= maxNoImprovement)
+            {
+                Console.WriteLine($"Алгоритм завершено достроково на {iter + 1}-й ітерації через відсутність покращень.");
             }
         }
 
